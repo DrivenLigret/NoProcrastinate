@@ -3,6 +3,8 @@ import NoProcrastinateCore
 
 struct StudyPlanView: View {
     @ObservedObject var planner: StudyPlannerViewModel
+    @ObservedObject var focus: FocusViewModel
+    let openFocus: () -> Void
     @Environment(\.scenePhase) private var scenePhase
     @State private var showingPlan = false
 
@@ -62,7 +64,7 @@ struct StudyPlanView: View {
                 }
             }
             .navigationDestination(for: UUID.self) { id in
-                StudyTaskDetailView(planner: planner, taskID: id)
+                StudyTaskDetailView(planner: planner, focus: focus, taskID: id, openFocus: openFocus)
             }
             .sheet(isPresented: $showingPlan) { PlanStudyTaskView(planner: planner) }
             .alert("Plan", isPresented: Binding(get: { planner.error != nil }, set: { if !$0 { planner.error = nil } })) {
@@ -81,7 +83,7 @@ private struct StudyTaskRow: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: 14) {
-            Image(systemName: "calendar")
+            Image(systemName: task.completedAt == nil ? "calendar" : "checkmark.circle")
                 .font(.title3)
                 .foregroundStyle(.tint)
                 .frame(width: 42, height: 42)
@@ -91,7 +93,7 @@ private struct StudyTaskRow: View {
                 Text(task.plannedStart, format: .dateTime.month(.abbreviated).day().hour().minute())
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
-                Text("\(task.focusMinutes) min").font(.caption.weight(.medium)).foregroundStyle(.tint)
+                Text(task.completedAt == nil ? "\(task.focusMinutes) min" : "Completed").font(.caption.weight(.medium)).foregroundStyle(.tint)
             }
             Spacer(minLength: 4)
             Image(systemName: "chevron.right").font(.caption.weight(.semibold)).foregroundStyle(.tertiary).padding(.top, 5)

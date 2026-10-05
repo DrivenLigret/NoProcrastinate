@@ -47,4 +47,20 @@ final class StudyPersistenceTests: XCTestCase {
         XCTAssertThrowsError(try repository.save(orphan)) { XCTAssertEqual($0 as? StudyError, .taskMissing) }
         XCTAssertTrue(try repository.sessions().isEmpty)
     }
+
+    func testExpiredFocusIsFinalizedAtScheduledEndAfterStoreReopening() throws {
+        let task = StudyTask(title: "Read chapter 2", plannedStart: now, deadline: now.addingTimeInterval(7200), createdAt: now)
+        let session = FocusSession(taskID: task.id, startedAt: now, plannedMinutes: 25)
+        do {
+            let repository = try CoreDataStudyRepository(storeURL: store)
+            try repository.save(task)
+            try repository.save(session)
+        }
+        let reopened = try CoreDataStudyRepository(storeURL: store)
+        XCTAssertNil(try RestoreFocusSession(repository: reopened).execute(at: now.addingTimeInterval(8000)))
+        let saved = try XCTUnwrap(reopened.sessions().first)
+        XCTAssertEqual(saved.endedAt, session.expectedEnd)
+        XCTAssertEqual(saved.recordedSeconds, 1500)
+        XCTAssertFalse(saved.interrupted)
+    }
 }
