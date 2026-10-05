@@ -16,6 +16,8 @@ jobs:
           echo "DEVICE=$DEVICE" >> "$GITHUB_ENV"
       - name: Test
         run: xcodebuild test -project NoProcrastinate.xcodeproj -scheme NoProcrastinate -destination "platform=iOS Simulator,id=$DEVICE" -parallel-testing-enabled NO CODE_SIGNING_ALLOWED=NO -resultBundlePath Results.xcresult
+      - name: Device build
+        run: xcodebuild build -project NoProcrastinate.xcodeproj -scheme NoProcrastinate -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO
       - name: Screenshots
         if: always()
         continue-on-error: true

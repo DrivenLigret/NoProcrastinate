@@ -6,23 +6,30 @@ struct NoProcrastinateApp: App {
     @StateObject private var planner: StudyPlannerViewModel
     @StateObject private var focus: FocusViewModel
     @StateObject private var progress: StudyProgressViewModel
+    @StateObject private var supervision: StudySupervisionViewModel
 
     init() {
+        let preferences = StudySupervisionPreferences()
+        let restrictions = FocusRestrictionController(preferences: preferences)
         do {
             let repository = try CoreDataStudyRepository(storeURL: Self.testingStore())
-            _planner = StateObject(wrappedValue: StudyPlannerViewModel(repository: repository))
-            _focus = StateObject(wrappedValue: FocusViewModel(repository: repository))
+            let supervisor = StudySupervisionViewModel(repository: repository, preferences: preferences, restrictions: restrictions)
+            _supervision = StateObject(wrappedValue: supervisor)
+            _planner = StateObject(wrappedValue: StudyPlannerViewModel(repository: repository, supervision: supervisor))
+            _focus = StateObject(wrappedValue: FocusViewModel(repository: repository, supervision: supervisor))
             _progress = StateObject(wrappedValue: StudyProgressViewModel(repository: repository))
         } catch {
-            _planner = StateObject(wrappedValue: StudyPlannerViewModel(repository: nil, initialError: StudyError.storageUnavailable.localizedDescription))
-            _focus = StateObject(wrappedValue: FocusViewModel(repository: nil))
+            let supervisor = StudySupervisionViewModel(repository: nil, preferences: preferences, restrictions: restrictions)
+            _supervision = StateObject(wrappedValue: supervisor)
+            _planner = StateObject(wrappedValue: StudyPlannerViewModel(repository: nil, supervision: supervisor, initialError: StudyError.storageUnavailable.localizedDescription))
+            _focus = StateObject(wrappedValue: FocusViewModel(repository: nil, supervision: supervisor))
             _progress = StateObject(wrappedValue: StudyProgressViewModel(repository: nil))
         }
     }
 
     var body: some Scene {
         WindowGroup {
-            StudyRootView(planner: planner, focus: focus, progress: progress)
+            StudyRootView(planner: planner, focus: focus, progress: progress, supervision: supervision)
                 .tint(Color(red: 0.08, green: 0.43, blue: 0.39))
                 .environment(\.locale, Locale(identifier: "en"))
         }
