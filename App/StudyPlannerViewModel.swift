@@ -33,4 +33,11 @@ final class StudyPlannerViewModel: ObservableObject {
         tasks.append(task)
         tasks.sort { $0.plannedStart < $1.plannedStart }
     }
+
+    func complete(taskID: UUID) throws {
+        guard let repository else { throw StudyError.storageUnavailable }
+        let completed = try CompleteStudyTask(repository: repository).execute(taskID: taskID, at: Date())
+        if let index = tasks.firstIndex(where: { $0.id == taskID }) { tasks[index] = completed }
+        overdueCount = tasks.filter { $0.completedAt == nil && $0.plannedStart < Date() }.count
+    }
 }

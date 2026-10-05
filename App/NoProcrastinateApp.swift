@@ -4,19 +4,25 @@ import NoProcrastinateCore
 @main
 struct NoProcrastinateApp: App {
     @StateObject private var planner: StudyPlannerViewModel
+    @StateObject private var focus: FocusViewModel
+    @StateObject private var progress: StudyProgressViewModel
 
     init() {
         do {
             let repository = try CoreDataStudyRepository(storeURL: Self.testingStore())
             _planner = StateObject(wrappedValue: StudyPlannerViewModel(repository: repository))
+            _focus = StateObject(wrappedValue: FocusViewModel(repository: repository))
+            _progress = StateObject(wrappedValue: StudyProgressViewModel(repository: repository))
         } catch {
             _planner = StateObject(wrappedValue: StudyPlannerViewModel(repository: nil, initialError: StudyError.storageUnavailable.localizedDescription))
+            _focus = StateObject(wrappedValue: FocusViewModel(repository: nil))
+            _progress = StateObject(wrappedValue: StudyProgressViewModel(repository: nil))
         }
     }
 
     var body: some Scene {
         WindowGroup {
-            StudyPlanView(planner: planner)
+            StudyRootView(planner: planner, focus: focus, progress: progress)
                 .tint(Color(red: 0.08, green: 0.43, blue: 0.39))
                 .environment(\.locale, Locale(identifier: "en"))
         }

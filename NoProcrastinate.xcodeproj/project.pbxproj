@@ -21,6 +21,26 @@
 			"isa" = "PBXBuildFile";
 			"fileRef" = 8A6F2D8FDCA3956BF5AEDF52;
 		};
+		FD93AED20CC8B386C4CB7336 = {
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"path" = "Core/FocusUseCases.swift";
+			"sourceTree" = "SOURCE_ROOT";
+		};
+		E7CAAC210DD2915E00552832 = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = FD93AED20CC8B386C4CB7336;
+		};
+		353D86847FB0AEA642E43496 = {
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"path" = "Core/ReviewStudyProgress.swift";
+			"sourceTree" = "SOURCE_ROOT";
+		};
+		8BABDADFD3264450992FC725 = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = 353D86847FB0AEA642E43496;
+		};
 		52D62AFB5E60CDD87880D08A = {
 			"isa" = "PBXFileReference";
 			"lastKnownFileType" = "sourcecode.swift";
@@ -55,6 +75,8 @@
 			"isa" = "PBXGroup";
 			"children" = (
 				8A6F2D8FDCA3956BF5AEDF52,
+				FD93AED20CC8B386C4CB7336,
+				353D86847FB0AEA642E43496,
 				52D62AFB5E60CDD87880D08A,
 				E9384ACC862E622BE36215E2,
 				0623AF122252A3E30F811788,
@@ -67,6 +89,8 @@
 			"buildActionMask" = 2147483647;
 			"files" = (
 				A0BF42E4839A966C6D7CB46B,
+				E7CAAC210DD2915E00552832,
+				8BABDADFD3264450992FC725,
 				6B318ECA6C669AB92D1B7216,
 				DE8A97303181AA998E365D80,
 				A348E4553345AA8DCC93D5BB,
@@ -167,6 +191,16 @@
 			"sourceTree" = "BUILT_PRODUCTS_DIR";
 			"includeInIndex" = 0;
 		};
+		D80AAF4B1781C19C04D9DB29 = {
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"path" = "Tests/FocusUseCaseTests.swift";
+			"sourceTree" = "SOURCE_ROOT";
+		};
+		675EC08F3A1C7A5472910D77 = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = D80AAF4B1781C19C04D9DB29;
+		};
 		E10761438028161FBF553EFB = {
 			"isa" = "PBXFileReference";
 			"lastKnownFileType" = "sourcecode.swift";
@@ -180,6 +214,7 @@
 		73BA15451D011CCCFF865FC9 = {
 			"isa" = "PBXGroup";
 			"children" = (
+				D80AAF4B1781C19C04D9DB29,
 				E10761438028161FBF553EFB,
 			);
 			"name" = "NoProcrastinateCoreTests";
@@ -189,6 +224,7 @@
 			"isa" = "PBXSourcesBuildPhase";
 			"buildActionMask" = 2147483647;
 			"files" = (
+				675EC08F3A1C7A5472910D77,
 				45A3B2B332501D76B77F2BBC,
 			);
 			"runOnlyForDeploymentPostprocessing" = 0;
@@ -455,6 +491,16 @@
 			"sourceTree" = "BUILT_PRODUCTS_DIR";
 			"includeInIndex" = 0;
 		};
+		72E4962AA99F584397AF9546 = {
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"path" = "App/FocusViewModel.swift";
+			"sourceTree" = "SOURCE_ROOT";
+		};
+		657FC0DAF2D82CA2525BFE0C = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = 72E4962AA99F584397AF9546;
+		};
 		8BB2CCD32562A6B0D3D846BC = {
 			"isa" = "PBXFileReference";
 			"lastKnownFileType" = "sourcecode.swift";
@@ -475,6 +521,16 @@
 			"isa" = "PBXBuildFile";
 			"fileRef" = 6F180714189CD948DC774977;
 		};
+		E3A9066F812F45CD48F36C73 = {
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"path" = "App/StudyFocusView.swift";
+			"sourceTree" = "SOURCE_ROOT";
+		};
+		6E5BF8C26FDA6FA5A3E7860E = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = E3A9066F812F45CD48F36C73;
+		};
 		1D42A7CF24820E3B00733D0E = {
 			"isa" = "PBXFileReference";
 			"lastKnownFileType" = "sourcecode.swift";
@@ -494,6 +550,36 @@
 		A9D9B66FADAA2A3D23A460E6 = {
 			"isa" = "PBXBuildFile";
 			"fileRef" = 31CEB1D61F0E60B7DAB66C1B;
+		};
+		055D6C197D5C5B16C492907C = {
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"path" = "App/StudyProgressView.swift";
+			"sourceTree" = "SOURCE_ROOT";
+		};
+		8630155BDC65F6E89B9D32CB = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = 055D6C197D5C5B16C492907C;
+		};
+		D7450CB788FF290D54F2A04F = {
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"path" = "App/StudyProgressViewModel.swift";
+			"sourceTree" = "SOURCE_ROOT";
+		};
+		9D875BC1CAA971950CD19F09 = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = D7450CB788FF290D54F2A04F;
+		};
+		15BDE43C4FA86BF1FA3A3A07 = {
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"path" = "App/StudyRootView.swift";
+			"sourceTree" = "SOURCE_ROOT";
+		};
+		D14EF248B5C28320B7B52CDB = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = 15BDE43C4FA86BF1FA3A3A07;
 		};
 		C41C6B49154ED01DCCB597B6 = {
 			"isa" = "PBXFileReference";
@@ -518,10 +604,15 @@
 		689DDA8F8A4E39E9E1CDEDD6 = {
 			"isa" = "PBXGroup";
 			"children" = (
+				72E4962AA99F584397AF9546,
 				8BB2CCD32562A6B0D3D846BC,
 				6F180714189CD948DC774977,
+				E3A9066F812F45CD48F36C73,
 				1D42A7CF24820E3B00733D0E,
 				31CEB1D61F0E60B7DAB66C1B,
+				055D6C197D5C5B16C492907C,
+				D7450CB788FF290D54F2A04F,
+				15BDE43C4FA86BF1FA3A3A07,
 				C41C6B49154ED01DCCB597B6,
 				CCC057208D95F081DC05493F,
 			);
@@ -532,10 +623,15 @@
 			"isa" = "PBXSourcesBuildPhase";
 			"buildActionMask" = 2147483647;
 			"files" = (
+				657FC0DAF2D82CA2525BFE0C,
 				FA9700D4EA630B28B57BABAA,
 				D1752055DD683E9B3428F6D4,
+				6E5BF8C26FDA6FA5A3E7860E,
 				D3E96DC0072EE979A60FE9DE,
 				A9D9B66FADAA2A3D23A460E6,
+				8630155BDC65F6E89B9D32CB,
+				9D875BC1CAA971950CD19F09,
+				D14EF248B5C28320B7B52CDB,
 				57CCD70D728A1769F22A3C3F,
 			);
 			"runOnlyForDeploymentPostprocessing" = 0;
@@ -687,6 +783,16 @@
 			"sourceTree" = "BUILT_PRODUCTS_DIR";
 			"includeInIndex" = 0;
 		};
+		15AE3CA001B8C8FC4FFADB84 = {
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"path" = "UITests/StudyFocusUITests.swift";
+			"sourceTree" = "SOURCE_ROOT";
+		};
+		2BFB79BC4ACE0DB7F353A92F = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = 15AE3CA001B8C8FC4FFADB84;
+		};
 		DEED2DE4871EE3A2853D0B61 = {
 			"isa" = "PBXFileReference";
 			"lastKnownFileType" = "sourcecode.swift";
@@ -700,6 +806,7 @@
 		F06D7738A6745E3539A6152E = {
 			"isa" = "PBXGroup";
 			"children" = (
+				15AE3CA001B8C8FC4FFADB84,
 				DEED2DE4871EE3A2853D0B61,
 			);
 			"name" = "NoProcrastinateUITests";
@@ -709,6 +816,7 @@
 			"isa" = "PBXSourcesBuildPhase";
 			"buildActionMask" = 2147483647;
 			"files" = (
+				2BFB79BC4ACE0DB7F353A92F,
 				2ACB2C16A640229A02AC2623,
 			);
 			"runOnlyForDeploymentPostprocessing" = 0;
