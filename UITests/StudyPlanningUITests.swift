@@ -19,8 +19,9 @@ final class StudyPlanningUITests: XCTestCase {
         app.buttons["StudyTaskRow"].firstMatch.tap()
         XCTAssertTrue(app.staticTexts["TaskDetailTitle"].waitForExistence(timeout: 5))
         XCTAssertEqual(app.staticTexts["TaskDetailTitle"].label, "Read chapter 2")
-        XCTAssertTrue(app.staticTexts["25 min"].exists)
         capture("Task", app)
+        let duration = app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@ OR value CONTAINS %@", "25 min", "25 min")).firstMatch
+        XCTAssertTrue(duration.exists)
         app.terminate()
         app.launchArguments = ["-ui-testing"]
         app.launch()
