@@ -15,9 +15,15 @@ jobs:
           DEVICE=$(xcrun simctl list devices available -j | python3 -c 'import json,sys; d=json.load(sys.stdin); print(next(x["udid"] for k,v in d["devices"].items() if "iOS" in k for x in v if "iPhone" in x["name"]))')
           echo "DEVICE=$DEVICE" >> "$GITHUB_ENV"
       - name: Test
-        run: xcodebuild test -project NoProcrastinate.xcodeproj -scheme NoProcrastinateCore -destination "platform=iOS Simulator,id=$DEVICE" CODE_SIGNING_ALLOWED=NO -resultBundlePath Results.xcresult
+        run: xcodebuild test -project NoProcrastinate.xcodeproj -scheme NoProcrastinate -destination "platform=iOS Simulator,id=$DEVICE" -parallel-testing-enabled NO CODE_SIGNING_ALLOWED=NO -resultBundlePath Results.xcresult
+      - name: Screenshots
+        if: always()
+        continue-on-error: true
+        run: xcrun xcresulttool export attachments --path Results.xcresult --output-path Screenshots
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: Results
-          path: Results.xcresult
+          path: |
+            Results.xcresult
+            Screenshots
