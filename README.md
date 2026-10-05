@@ -2,15 +2,15 @@
 
 Task planning and focus support for young adults managing independent study.
 
-## Stage 1
+## Stage 2
 
-StudyTask, FocusSession, StudyRepository, PlanStudyTask and nine mock-repository tests. Task planning checks the title, start, deadline and focus duration.
+Plan, create and review study tasks. Tasks persist through app relaunch. PlanStudyTask validates the title, start, deadline and focus duration.
 
 ## Design
 
 SwiftUI Views → ViewModels → Use Cases → StudyRepository → Core Data.
 
-Core Data is planned for private, offline study records. StudyTask has many FocusSessions.
+Core Data stores private, offline study records. StudyTask has many FocusSessions. The repository queries incomplete tasks with a start earlier than now. Views and ViewModels use domain values.
 
 | Planned extension | Purpose |
 | --- | --- |
@@ -22,6 +22,8 @@ Planned App Group: `group.com.drivenligret.NoProcrastinate`.
 
 ## Setup
 
-Open `NoProcrastinate.xcodeproj` in Xcode 16 or later. Select an iOS 17 or later simulator and run tests with the `NoProcrastinateCore` scheme.
+Open `NoProcrastinate.xcodeproj` in Xcode 16 or later. Select an iOS 17 or later simulator and run the `NoProcrastinate` scheme. Select your signing team for a device build.
+
+The `NoProcrastinate` scheme tests planning with a mock repository, persistence in separate integration tests, and task creation followed by app relaunch. The `NoProcrastinateCore` scheme runs domain and persistence checks.
 
 Repository: https://github.com/DrivenLigret/NoProcrastinate
