@@ -37,7 +37,7 @@ final class StudyWidgetUITests: XCTestCase {
         search.tap()
         if home.buttons["Continue"].waitForExistence(timeout: 2) { home.buttons["Continue"].tap() }
         search.typeText("NoProcrastinate")
-        let result = home.buttons.matching(NSPredicate(format: "label CONTAINS %@", "NoProcrastinate")).firstMatch
+        let result = home.cells["NoProcrastinate"]
         XCTAssertTrue(result.waitForExistence(timeout: 10))
         result.tap()
         XCTAssertTrue(home.buttons["Add Widget"].waitForExistence(timeout: 10))
