@@ -4,12 +4,15 @@ import NoProcrastinateCore
 struct StudyPlanView: View {
     @ObservedObject var planner: StudyPlannerViewModel
     @ObservedObject var focus: FocusViewModel
+    @ObservedObject var supervision: StudySupervisionViewModel
+    @Binding var requestedTaskID: UUID?
     let openFocus: () -> Void
+    @State private var path: [UUID] = []
     @Environment(\.scenePhase) private var scenePhase
     @State private var showingPlan = false
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     if planner.canPlan {
@@ -64,7 +67,7 @@ struct StudyPlanView: View {
                 }
             }
             .navigationDestination(for: UUID.self) { id in
-                StudyTaskDetailView(planner: planner, focus: focus, taskID: id, openFocus: openFocus)
+                StudyTaskDetailView(planner: planner, focus: focus, supervision: supervision, taskID: id, openFocus: openFocus)
             }
             .sheet(isPresented: $showingPlan) { PlanStudyTaskView(planner: planner) }
             .alert("Plan", isPresented: Binding(get: { planner.error != nil }, set: { if !$0 { planner.error = nil } })) {
@@ -74,6 +77,12 @@ struct StudyPlanView: View {
             }
             .task { planner.load() }
             .onChange(of: scenePhase) { _, phase in if phase == .active { planner.load() } }
+            .onChange(of: requestedTaskID) { _, id in
+                guard let id else { return }
+                planner.load()
+                if planner.tasks.contains(where: { $0.id == id }) { path = [id] }
+                requestedTaskID = nil
+            }
         }
     }
 }
