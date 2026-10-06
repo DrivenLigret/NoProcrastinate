@@ -10,11 +10,11 @@ final class StudyShareUITests: XCTestCase {
         XCTAssertTrue(app.buttons["NewTask"].waitForExistence(timeout: 10))
         let safari = XCUIApplication(bundleIdentifier: "com.apple.mobilesafari")
         safari.launch()
-        if safari.buttons["Continue"].waitForExistence(timeout: 3) { safari.buttons["Continue"].tap() }
+        if safari.buttons["Continue"].firstMatch.waitForExistence(timeout: 3) { safari.buttons["Continue"].firstMatch.tap() }
         let address = safari.textFields.matching(NSPredicate(format: "identifier IN %@ OR label == %@", ["TabBarItemTitle", "URL"], "Address")).firstMatch
         XCTAssertTrue(address.waitForExistence(timeout: 10))
         address.tap()
-        if safari.buttons["Continue"].waitForExistence(timeout: 2) { safari.buttons["Continue"].tap() }
+        if safari.buttons["Continue"].firstMatch.waitForExistence(timeout: 2) { safari.buttons["Continue"].firstMatch.tap() }
         safari.textFields.firstMatch.typeText("https://example.com\n")
         XCTAssertTrue(safari.staticTexts["Example Domain"].waitForExistence(timeout: 30))
         openShare(safari)
