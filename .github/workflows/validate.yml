@@ -27,7 +27,6 @@ jobs:
       - name: Extensions
         run: |
           xcrun simctl install "$DEVICE" Build/Build/Products/Debug-iphonesimulator/NoProcrastinate.app
-          xcrun simctl launch "$DEVICE" com.drivenligret.NoProcrastinate
           xcrun simctl shutdown "$DEVICE"
           xcrun simctl boot "$DEVICE"
           xcrun simctl bootstatus "$DEVICE" -b
