@@ -69,6 +69,8 @@ final class StudyShareUITests: XCTestCase {
 
     private func openShare(_ safari: XCUIApplication) {
         XCTAssertTrue(safari.buttons["Share"].waitForExistence(timeout: 10))
+        let ready = XCTNSPredicateExpectation(predicate: NSPredicate(format: "enabled == true AND hittable == true"), object: safari.buttons["Share"])
+        XCTAssertEqual(XCTWaiter.wait(for: [ready], timeout: 30), .completed)
         safari.buttons["Share"].tap()
         let target = safari.descendants(matching: .any).matching(NSPredicate(format: "label == %@", "NoProcrastinate")).firstMatch
         if !target.waitForExistence(timeout: 3) {
