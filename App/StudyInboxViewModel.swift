@@ -33,7 +33,7 @@ final class StudyInboxViewModel: ObservableObject {
     func load() {
         guard let inbox else { return }
         do { resources = try inbox.resources() }
-        catch { error = StudyResourceError.inboxUnavailable.localizedDescription }
+        catch { self.error = StudyResourceError.inboxUnavailable.localizedDescription }
     }
 
     func plan(_ resource: StudyResource, title: String, start: Date, deadline: Date, minutes: Int) throws {
@@ -46,6 +46,6 @@ final class StudyInboxViewModel: ObservableObject {
     func discard(_ resource: StudyResource) {
         guard let inbox else { return }
         do { try inbox.remove(id: resource.id); load() }
-        catch { error = StudyResourceError.inboxUnavailable.localizedDescription }
+        catch { self.error = StudyResourceError.inboxUnavailable.localizedDescription }
     }
 }
