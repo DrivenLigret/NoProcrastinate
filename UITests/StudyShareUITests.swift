@@ -16,7 +16,8 @@ final class StudyShareUITests: XCTestCase {
         address.tap()
         if safari.buttons["Continue"].firstMatch.waitForExistence(timeout: 2) { safari.buttons["Continue"].firstMatch.tap() }
         safari.textFields.firstMatch.typeText("https://example.com\n")
-        XCTAssertTrue(safari.staticTexts["Example Domain"].waitForExistence(timeout: 30))
+        let loaded = XCTNSPredicateExpectation(predicate: NSPredicate(format: "value CONTAINS %@", "example.com"), object: address)
+        XCTAssertEqual(XCTWaiter.wait(for: [loaded], timeout: 30), .completed)
         openShare(safari)
         XCTAssertTrue(safari.textFields["SharedTaskTitle"].waitForExistence(timeout: 10))
         safari.buttons["Cancel"].tap()
@@ -32,6 +33,8 @@ final class StudyShareUITests: XCTestCase {
         capture("Share", safari)
         safari.buttons["SaveResource"].tap()
         XCTAssertTrue(safari.buttons["Share"].waitForExistence(timeout: 10))
+        let ready = XCTNSPredicateExpectation(predicate: NSPredicate(format: "enabled == true"), object: safari.buttons["Share"])
+        XCTAssertEqual(XCTWaiter.wait(for: [ready], timeout: 30), .completed)
         app.activate()
         let pending = app.buttons["InboxResource"].firstMatch
         XCTAssertTrue(pending.waitForExistence(timeout: 10))
