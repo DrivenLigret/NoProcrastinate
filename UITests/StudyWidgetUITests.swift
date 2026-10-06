@@ -32,10 +32,8 @@ final class StudyWidgetUITests: XCTestCase {
         gallery.name = "Widget gallery"
         gallery.lifetime = .keepAlways
         add(gallery)
-        let visibleSearch = NSPredicate { _, _ in home.searchFields.allElementsBoundByIndex.contains(where: { $0.isHittable }) }
-        expectation(for: visibleSearch, evaluatedWith: home)
-        waitForExpectations(timeout: 10)
-        guard let search = home.searchFields.allElementsBoundByIndex.first(where: { $0.isHittable }) else { return }
+        let search = home.searchFields["Search Widgets"]
+        XCTAssertTrue(search.waitForExistence(timeout: 10))
         search.tap()
         if home.buttons["Continue"].waitForExistence(timeout: 2) { home.buttons["Continue"].tap() }
         search.typeText("NoProcrastinate")
