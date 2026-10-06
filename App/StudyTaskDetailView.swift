@@ -41,6 +41,15 @@ struct StudyTaskDetailView: View {
                         }
                         LabeledContent("Status", value: task.completedAt != nil ? "Completed" : task.plannedStart < Date() ? "Overdue" : "Planned")
                     }
+                    if let source = task.source {
+                        Section("Source") {
+                            if let url = URL(string: source), ["http", "https"].contains(url.scheme?.lowercased() ?? ""), url.host != nil {
+                                Link(source, destination: url).accessibilityIdentifier("TaskSource")
+                            } else {
+                                Text(source).textSelection(.enabled).accessibilityIdentifier("TaskSource")
+                            }
+                        }
+                    }
                     if task.completedAt == nil {
                         Section {
                             Button(focus.active?.taskID == task.id ? "Resume focus" : "Start focus") {

@@ -1,4 +1,5 @@
 import SwiftUI
+import NoProcrastinateCore
 
 struct PlanStudyTaskView: View {
     @ObservedObject var planner: StudyPlannerViewModel
@@ -9,6 +10,15 @@ struct PlanStudyTaskView: View {
     @State private var minutes = 25
     @State private var failure: String?
     @FocusState private var editingTitle: Bool
+    private let resource: StudyResource?
+    private let importResource: ((String, Date, Date, Int) throws -> Void)?
+
+    init(planner: StudyPlannerViewModel, resource: StudyResource? = nil, importResource: ((String, Date, Date, Int) throws -> Void)? = nil) {
+        self.planner = planner
+        self.resource = resource
+        self.importResource = importResource
+        _title = State(initialValue: resource?.title ?? "")
+    }
 
     var body: some View {
         NavigationStack {
@@ -19,6 +29,9 @@ struct PlanStudyTaskView: View {
                         .focused($editingTitle)
                         .submitLabel(.done)
                         .onSubmit { editingTitle = false }
+                }
+                if let resource {
+                    Section("Source") { Text(resource.content).font(.callout).lineLimit(5) }
                 }
                 Section {
                     DatePicker("Start", selection: $start, in: Date()..., displayedComponents: [.date, .hourAndMinute])
@@ -37,7 +50,8 @@ struct PlanStudyTaskView: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
                         do {
-                            try planner.plan(title: title, start: start, deadline: deadline, minutes: minutes)
+                            if let importResource { try importResource(title, start, deadline, minutes) }
+                            else { try planner.plan(title: title, start: start, deadline: deadline, minutes: minutes) }
                             dismiss()
                         } catch {
                             failure = error.localizedDescription

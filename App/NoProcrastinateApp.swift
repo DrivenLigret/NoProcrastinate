@@ -8,6 +8,7 @@ struct NoProcrastinateApp: App {
     @StateObject private var progress: StudyProgressViewModel
     @StateObject private var supervision: StudySupervisionViewModel
     @StateObject private var widget: StudyWidgetPublisher
+    @StateObject private var inbox: StudyInboxViewModel
 
     init() {
         let preferences = StudySupervisionPreferences()
@@ -22,6 +23,7 @@ struct NoProcrastinateApp: App {
             _planner = StateObject(wrappedValue: StudyPlannerViewModel(repository: repository, supervision: supervisor))
             _focus = StateObject(wrappedValue: FocusViewModel(repository: repository, supervision: supervisor))
             _progress = StateObject(wrappedValue: StudyProgressViewModel(repository: repository))
+            _inbox = StateObject(wrappedValue: StudyInboxViewModel(repository: repository))
         } catch {
             _widget = StateObject(wrappedValue: StudyWidgetPublisher(repository: nil))
             let supervisor = StudySupervisionViewModel(repository: nil, preferences: preferences, restrictions: restrictions)
@@ -29,12 +31,13 @@ struct NoProcrastinateApp: App {
             _planner = StateObject(wrappedValue: StudyPlannerViewModel(repository: nil, supervision: supervisor, initialError: StudyError.storageUnavailable.localizedDescription))
             _focus = StateObject(wrappedValue: FocusViewModel(repository: nil, supervision: supervisor))
             _progress = StateObject(wrappedValue: StudyProgressViewModel(repository: nil))
+            _inbox = StateObject(wrappedValue: StudyInboxViewModel(repository: nil))
         }
     }
 
     var body: some Scene {
         WindowGroup {
-            StudyRootView(planner: planner, focus: focus, progress: progress, supervision: supervision, widget: widget)
+            StudyRootView(planner: planner, focus: focus, progress: progress, supervision: supervision, widget: widget, inbox: inbox)
                 .tint(Color(red: 0.08, green: 0.43, blue: 0.39))
                 .environment(\.locale, Locale(identifier: "en"))
         }

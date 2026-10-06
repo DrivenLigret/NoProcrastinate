@@ -1,12 +1,13 @@
 import SwiftUI
 
 struct StudyRootView: View {
-    private enum StudyTab: Hashable { case plan, focus, progress, supervision }
+    private enum StudyTab: Hashable { case plan, focus, progress, inbox, supervision }
     @ObservedObject var planner: StudyPlannerViewModel
     @ObservedObject var focus: FocusViewModel
     @ObservedObject var progress: StudyProgressViewModel
     @ObservedObject var supervision: StudySupervisionViewModel
     @ObservedObject var widget: StudyWidgetPublisher
+    @ObservedObject var inbox: StudyInboxViewModel
     @ObservedObject private var route = StudyNotificationRoute.shared
     @State private var requestedTaskID: UUID?
     @State private var tab = StudyTab.plan
@@ -20,6 +21,9 @@ struct StudyRootView: View {
                 .tabItem { Label("Focus", systemImage: "timer") }.tag(StudyTab.focus)
             StudyProgressView(progress: progress)
                 .tabItem { Label("Progress", systemImage: "chart.bar") }.tag(StudyTab.progress)
+            StudyInboxView(inbox: inbox, planner: planner, supervision: supervision)
+                .tabItem { Label("Inbox", systemImage: "tray") }.tag(StudyTab.inbox)
+                .badge(inbox.resources.count)
             StudySupervisionView(supervision: supervision, focus: focus, widget: widget)
                 .tabItem { Label("Supervision", systemImage: "hand.raised") }.tag(StudyTab.supervision)
         }
@@ -37,6 +41,7 @@ struct StudyRootView: View {
             switch url.host {
             case "focus": tab = .focus
             case "progress": tab = .progress
+            case "inbox": tab = .inbox
             case "task":
                 if let id = UUID(uuidString: url.path.trimmingCharacters(in: CharacterSet(charactersIn: "/"))) {
                     tab = .plan
@@ -53,5 +58,6 @@ struct StudyRootView: View {
         planner.load()
         progress.load()
         widget.publish()
+        inbox.load()
     }
 }
