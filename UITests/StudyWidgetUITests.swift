@@ -27,6 +27,7 @@ final class StudyWidgetUITests: XCTestCase {
             XCTAssertTrue(home.buttons["Add Widget"].waitForExistence(timeout: 5))
             home.buttons["Add Widget"].tap()
         } else { home.buttons["Add"].tap() }
+        if home.buttons["Continue"].exists { home.buttons["Continue"].tap() }
         let gallery = XCTAttachment(screenshot: home.screenshot())
         gallery.name = "Widget gallery"
         gallery.lifetime = .keepAlways
@@ -36,6 +37,7 @@ final class StudyWidgetUITests: XCTestCase {
         waitForExpectations(timeout: 10)
         guard let search = home.searchFields.allElementsBoundByIndex.first(where: { $0.isHittable }) else { return }
         search.tap()
+        if home.buttons["Continue"].waitForExistence(timeout: 2) { home.buttons["Continue"].tap() }
         search.typeText("NoProcrastinate")
         let result = home.buttons.matching(NSPredicate(format: "label CONTAINS %@", "NoProcrastinate")).firstMatch
         XCTAssertTrue(result.waitForExistence(timeout: 10))
