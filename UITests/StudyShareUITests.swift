@@ -22,7 +22,7 @@ final class StudyShareUITests: XCTestCase {
         XCTAssertTrue(safari.textFields["SharedTaskTitle"].waitForExistence(timeout: 10))
         safari.buttons["Cancel"].tap()
         app.activate()
-        app.tabBars.buttons["Inbox"].tap()
+        selectTab("Inbox", app)
         XCTAssertTrue(app.staticTexts["No shared resources"].waitForExistence(timeout: 10))
         safari.activate()
         openShare(safari)
@@ -48,7 +48,7 @@ final class StudyShareUITests: XCTestCase {
         capture("Import", app)
         app.buttons["SaveTask"].tap()
         XCTAssertTrue(app.staticTexts["No shared resources"].waitForExistence(timeout: 5))
-        app.tabBars.buttons["Plan"].tap()
+        selectTab("Plan", app)
         XCTAssertEqual(app.staticTexts["TaskCount"].label, "1 task")
         app.buttons["StudyTaskRow"].firstMatch.tap()
         XCTAssertEqual(app.staticTexts["TaskDetailTitle"].label, resourceTitle)
@@ -63,8 +63,21 @@ final class StudyShareUITests: XCTestCase {
         XCTAssertEqual(app.staticTexts["TaskCount"].label, "1 task")
         app.buttons["StudyTaskRow"].firstMatch.tap()
         XCTAssertTrue(app.descendants(matching: .any)["TaskSource"].waitForExistence(timeout: 5))
-        app.tabBars.buttons["Inbox"].tap()
+        selectTab("Inbox", app)
         XCTAssertTrue(app.staticTexts["No shared resources"].waitForExistence(timeout: 5))
+    }
+
+    private func selectTab(_ name: String, _ app: XCUIApplication) {
+        let button = app.tabBars.buttons[name]
+        XCTAssertTrue(button.waitForExistence(timeout: 10))
+        button.tap()
+        let selected = NSPredicate { element, _ in (element as? XCUIElement)?.isSelected == true }
+        let first = XCTNSPredicateExpectation(predicate: selected, object: button)
+        if XCTWaiter.wait(for: [first], timeout: 2) != .completed {
+            button.tap()
+            let retry = XCTNSPredicateExpectation(predicate: selected, object: button)
+            XCTAssertEqual(XCTWaiter.wait(for: [retry], timeout: 5), .completed)
+        }
     }
 
     private func openShare(_ safari: XCUIApplication) {
