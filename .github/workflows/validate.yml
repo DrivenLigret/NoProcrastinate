@@ -7,7 +7,7 @@ on:
     inputs:
       suite:
         type: choice
-        options: [All, Share, Widget]
+        options: [All, Share, Widget, Startup]
         default: All
 permissions:
   contents: read
@@ -38,14 +38,32 @@ jobs:
             FILTER=(-only-testing:NoProcrastinateUITests/StudyShareUITests)
           elif [[ "${{ inputs.suite }}" == Widget ]]; then
             FILTER=(-only-testing:NoProcrastinateUITests/StudyWidgetUITests)
+          elif [[ "${{ inputs.suite }}" == Startup ]]; then
+            FILTER=(-only-testing:NoProcrastinateUITests/StudyStartupUITests)
           fi
           xcodebuild test-without-building -project NoProcrastinate.xcodeproj -scheme NoProcrastinate -derivedDataPath Build -destination "platform=iOS Simulator,id=$DEVICE" -parallel-testing-enabled NO CODE_SIGN_STYLE=Manual CODE_SIGNING_ALLOWED=YES CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=- -resultBundlePath Results.xcresult "${FILTER[@]}"
       - name: Device build
         run: xcodebuild build -project NoProcrastinate.xcodeproj -scheme NoProcrastinate -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO
       - name: Screenshots
-        if: always()
+        if: always() && hashFiles('Results.xcresult/Info.plist') != ''
         continue-on-error: true
         run: xcrun xcresulttool export attachments --path Results.xcresult --output-path Screenshots
+      - name: Diagnostics
+        if: failure()
+        run: |
+          mkdir -p Diagnostics
+          xcrun simctl spawn "$DEVICE" log show --last 10m --style compact --predicate 'process == "NoProcrastinate" OR process == "SpringBoard" OR process == "runningboardd" OR process == "ReportCrash"' > Diagnostics/Simulator.log 2>&1 || true
+          python3 - <<'PY'
+          import os
+          import shutil
+          from pathlib import Path
+          roots = [Path.home() / 'Library/Logs/DiagnosticReports', Path.home() / 'Library/Developer/CoreSimulator/Devices' / os.environ['DEVICE'] / 'data/Library/Logs']
+          for root in roots:
+              if root.exists():
+                  for pattern in ['**/NoProcrastinate*.ips', '**/NoProcrastinate*.crash']:
+                      for report in root.glob(pattern):
+                          shutil.copy2(report, Path('Diagnostics') / report.name)
+          PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -53,3 +71,4 @@ jobs:
           path: |
             Results.xcresult
             Screenshots
+            Diagnostics
