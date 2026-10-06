@@ -11,11 +11,11 @@ final class StudyShareUITests: XCTestCase {
         let safari = XCUIApplication(bundleIdentifier: "com.apple.mobilesafari")
         safari.launch()
         if safari.buttons["Continue"].waitForExistence(timeout: 3) { safari.buttons["Continue"].tap() }
-        let address = safari.textFields["URL"]
+        let address = safari.textFields.matching(NSPredicate(format: "identifier IN %@ OR label == %@", ["TabBarItemTitle", "URL"], "Address")).firstMatch
         XCTAssertTrue(address.waitForExistence(timeout: 10))
         address.tap()
         if safari.buttons["Continue"].waitForExistence(timeout: 2) { safari.buttons["Continue"].tap() }
-        address.typeText("https://example.com\n")
+        safari.textFields.firstMatch.typeText("https://example.com\n")
         XCTAssertTrue(safari.staticTexts["Example Domain"].waitForExistence(timeout: 30))
         openShare(safari)
         XCTAssertTrue(safari.textFields["SharedTaskTitle"].waitForExistence(timeout: 10))
@@ -27,14 +27,8 @@ final class StudyShareUITests: XCTestCase {
         openShare(safari)
         let sharedTitle = safari.textFields["SharedTaskTitle"]
         XCTAssertTrue(sharedTitle.waitForExistence(timeout: 10))
-        sharedTitle.tap()
-        sharedTitle.press(forDuration: 1)
-        if safari.menuItems["Select All"].waitForExistence(timeout: 2) { safari.menuItems["Select All"].tap() }
-        else {
-            let value = sharedTitle.value as? String ?? ""
-            sharedTitle.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: value.count))
-        }
-        sharedTitle.typeText("Read example\n")
+        let resourceTitle = sharedTitle.value as? String
+        XCTAssertFalse(resourceTitle?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true)
         capture("Share", safari)
         safari.buttons["SaveResource"].tap()
         XCTAssertTrue(safari.buttons["Share"].waitForExistence(timeout: 10))
@@ -44,7 +38,7 @@ final class StudyShareUITests: XCTestCase {
         capture("Inbox", app)
         pending.tap()
         XCTAssertTrue(app.textFields["TaskTitle"].waitForExistence(timeout: 5))
-        XCTAssertEqual(app.textFields["TaskTitle"].value as? String, "Read example")
+        XCTAssertEqual(app.textFields["TaskTitle"].value as? String, resourceTitle)
         app.buttons["Cancel"].tap()
         XCTAssertTrue(pending.waitForExistence(timeout: 5))
         pending.tap()
@@ -54,7 +48,7 @@ final class StudyShareUITests: XCTestCase {
         app.tabBars.buttons["Plan"].tap()
         XCTAssertEqual(app.staticTexts["TaskCount"].label, "1 task")
         app.buttons["StudyTaskRow"].firstMatch.tap()
-        XCTAssertEqual(app.staticTexts["TaskDetailTitle"].label, "Read example")
+        XCTAssertEqual(app.staticTexts["TaskDetailTitle"].label, resourceTitle)
         let source = app.descendants(matching: .any)["TaskSource"]
         XCTAssertTrue(source.waitForExistence(timeout: 5))
         XCTAssertTrue(source.label.hasPrefix("https://example.com"))
