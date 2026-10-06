@@ -56,7 +56,12 @@ final class StudySupervisionUITests: XCTestCase {
         expectation(for: NSPredicate(format: "value == %@", "2"), evaluatedWith: scheduled)
         waitForExpectations(timeout: 10)
         capture("Supervision", app)
+        expectation(for: NSPredicate(format: "enabled == true"), evaluatedWith: toggle)
+        waitForExpectations(timeout: 5)
         toggle.coordinate(withNormalizedOffset: CGVector(dx: 0.92, dy: 0.5)).tap()
+        capture("Reminders off", app)
+        expectation(for: NSPredicate(format: "value == %@", "0"), evaluatedWith: toggle)
+        waitForExpectations(timeout: 5)
         expectation(for: NSPredicate(format: "value == %@", "0"), evaluatedWith: scheduled)
         waitForExpectations(timeout: 10)
     }

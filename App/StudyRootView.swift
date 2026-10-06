@@ -6,6 +6,7 @@ struct StudyRootView: View {
     @ObservedObject var focus: FocusViewModel
     @ObservedObject var progress: StudyProgressViewModel
     @ObservedObject var supervision: StudySupervisionViewModel
+    @ObservedObject var widget: StudyWidgetPublisher
     @ObservedObject private var route = StudyNotificationRoute.shared
     @State private var requestedTaskID: UUID?
     @State private var tab = StudyTab.plan
@@ -19,7 +20,7 @@ struct StudyRootView: View {
                 .tabItem { Label("Focus", systemImage: "timer") }.tag(StudyTab.focus)
             StudyProgressView(progress: progress)
                 .tabItem { Label("Progress", systemImage: "chart.bar") }.tag(StudyTab.progress)
-            StudySupervisionView(supervision: supervision, focus: focus)
+            StudySupervisionView(supervision: supervision, focus: focus, widget: widget)
                 .tabItem { Label("Supervision", systemImage: "hand.raised") }.tag(StudyTab.supervision)
         }
         .task { refresh() }
@@ -31,6 +32,19 @@ struct StudyRootView: View {
             requestedTaskID = taskID
             route.taskID = nil
         }
+        .onOpenURL { url in
+            guard url.scheme == "noprocrastinate" else { return }
+            switch url.host {
+            case "focus": tab = .focus
+            case "progress": tab = .progress
+            case "task":
+                if let id = UUID(uuidString: url.path.trimmingCharacters(in: CharacterSet(charactersIn: "/"))) {
+                    tab = .plan
+                    requestedTaskID = id
+                }
+            default: tab = .plan
+            }
+        }
     }
 
     private func refresh() {
@@ -38,5 +52,6 @@ struct StudyRootView: View {
         focus.load()
         planner.load()
         progress.load()
+        widget.publish()
     }
 }

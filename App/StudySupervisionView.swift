@@ -4,6 +4,7 @@ import FamilyControls
 struct StudySupervisionView: View {
     @ObservedObject var supervision: StudySupervisionViewModel
     @ObservedObject var focus: FocusViewModel
+    @ObservedObject var widget: StudyWidgetPublisher
     @State private var choosingApps = false
 
     var body: some View {
@@ -33,6 +34,13 @@ struct StudySupervisionView: View {
                     LabeledContent("Selected", value: "\(supervision.selectedCount)")
                     Toggle("During focus", isOn: Binding(get: { supervision.limits }, set: supervision.setLimits))
                         .disabled(!supervision.authorized || supervision.selectedCount == 0)
+                }
+                Section("Widget") {
+                    LabeledContent("Access", value: widget.ready ? "Ready" : "Unavailable")
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel("Widget")
+                        .accessibilityValue(widget.ready ? "Ready" : "Unavailable")
+                        .accessibilityIdentifier("WidgetAccess")
                 }
             }
             .navigationTitle("Supervision")
