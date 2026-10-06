@@ -40,8 +40,12 @@ final class StudyWidgetUITests: XCTestCase {
         let result = home.cells["NoProcrastinate"]
         XCTAssertTrue(result.waitForExistence(timeout: 10))
         result.tap()
-        XCTAssertTrue(home.buttons["Add Widget"].waitForExistence(timeout: 10))
-        home.buttons["Add Widget"].tap()
+        let addWidget = home.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Add Widget")).firstMatch
+        XCTAssertTrue(addWidget.waitForExistence(timeout: 10))
+        capture("Small widget", home)
+        home.coordinate(withNormalizedOffset: CGVector(dx: 0.75, dy: 0.58)).press(forDuration: 0.1, thenDragTo: home.coordinate(withNormalizedOffset: CGVector(dx: 0.25, dy: 0.58)))
+        capture("Medium widget", home)
+        addWidget.tap()
         if home.buttons["Done"].waitForExistence(timeout: 5) { home.buttons["Done"].tap() }
         let task = home.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@", "Review chapter 5")).firstMatch
         XCTAssertTrue(task.waitForExistence(timeout: 30))
@@ -52,5 +56,12 @@ final class StudyWidgetUITests: XCTestCase {
         task.tap()
         XCTAssertTrue(app.staticTexts["TaskDetailTitle"].waitForExistence(timeout: 10))
         XCTAssertEqual(app.staticTexts["TaskDetailTitle"].label, "Review chapter 5")
+    }
+
+    private func capture(_ name: String, _ app: XCUIApplication) {
+        let attachment = XCTAttachment(screenshot: app.screenshot())
+        attachment.name = name
+        attachment.lifetime = .keepAlways
+        add(attachment)
     }
 }
