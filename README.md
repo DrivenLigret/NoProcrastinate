@@ -2,7 +2,7 @@
 
 Task planning and focus support for young adults managing independent study.
 
-## Stage 6
+## Stage 7
 
 Plan tasks, run focus sessions, complete tasks and review progress. Supervision adds postponement, adaptive focus suggestions, local reminders and optional app limits. Records persist through app relaunch.
 

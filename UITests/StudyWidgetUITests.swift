@@ -38,12 +38,15 @@ final class StudyWidgetUITests: XCTestCase {
         if home.buttons["Continue"].waitForExistence(timeout: 2) { home.buttons["Continue"].tap() }
         search.typeText("NoProcrastinate")
         let result = home.cells["NoProcrastinate"]
-        XCTAssertTrue(result.waitForExistence(timeout: 10))
+        XCTAssertTrue(result.waitForExistence(timeout: 30))
         result.tap()
         let addWidget = home.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Add Widget")).firstMatch
         XCTAssertTrue(addWidget.waitForExistence(timeout: 10))
         capture("Small widget", home)
-        home.coordinate(withNormalizedOffset: CGVector(dx: 0.75, dy: 0.58)).press(forDuration: 0.1, thenDragTo: home.coordinate(withNormalizedOffset: CGVector(dx: 0.25, dy: 0.58)))
+        let pager = home.pageIndicators.allElementsBoundByIndex.first { $0.frame.minY > home.frame.height * 0.86 && $0.frame.maxY < home.frame.height }
+        XCTAssertNotNil(pager)
+        pager?.coordinate(withNormalizedOffset: CGVector(dx: 0.75, dy: 0.5)).tap()
+        XCTAssertTrue(home.staticTexts["Today"].waitForExistence(timeout: 10))
         capture("Medium widget", home)
         addWidget.tap()
         if home.buttons["Done"].waitForExistence(timeout: 5) { home.buttons["Done"].tap() }
@@ -56,6 +59,15 @@ final class StudyWidgetUITests: XCTestCase {
         task.tap()
         XCTAssertTrue(app.staticTexts["TaskDetailTitle"].waitForExistence(timeout: 10))
         XCTAssertEqual(app.staticTexts["TaskDetailTitle"].label, "Review chapter 5")
+        app.buttons["CompleteTask"].tap()
+        XCUIDevice.shared.press(.home)
+        let completed = home.descendants(matching: .any).matching(NSPredicate(format: "label == %@", "1 done")).firstMatch
+        XCTAssertTrue(completed.waitForExistence(timeout: 60))
+        XCTAssertTrue(home.staticTexts["Plan a task"].exists)
+        capture("Updated medium widget", home)
+        let progress = home.descendants(matching: .any).matching(NSPredicate(format: "label == %@", "Progress")).firstMatch
+        progress.tap()
+        XCTAssertTrue(app.navigationBars["Progress"].waitForExistence(timeout: 10))
     }
 
     private func capture(_ name: String, _ app: XCUIApplication) {

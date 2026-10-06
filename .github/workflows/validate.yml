@@ -1,12 +1,13 @@
 name: Validate
 on:
   push:
+    branches: [main, 'feat/**']
   pull_request:
   workflow_dispatch:
     inputs:
       suite:
         type: choice
-        options: [All, Share]
+        options: [All, Share, Widget]
         default: All
 permissions:
   contents: read
@@ -19,13 +20,26 @@ jobs:
         run: |
           DEVICE=$(xcrun simctl list devices available -j | python3 -c 'import json,sys; d=json.load(sys.stdin); print(next(x["udid"] for k,v in d["devices"].items() if "iOS" in k for x in v if "iPhone" in x["name"]))')
           echo "DEVICE=$DEVICE" >> "$GITHUB_ENV"
+          xcrun simctl boot "$DEVICE"
+          xcrun simctl bootstatus "$DEVICE" -b
+      - name: Build tests
+        run: xcodebuild build-for-testing -project NoProcrastinate.xcodeproj -scheme NoProcrastinate -derivedDataPath Build -destination "platform=iOS Simulator,id=$DEVICE" CODE_SIGN_STYLE=Manual CODE_SIGNING_ALLOWED=YES CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=-
+      - name: Extensions
+        run: |
+          xcrun simctl install "$DEVICE" Build/Build/Products/Debug-iphonesimulator/NoProcrastinate.app
+          xcrun simctl launch "$DEVICE" com.drivenligret.NoProcrastinate
+          xcrun simctl shutdown "$DEVICE"
+          xcrun simctl boot "$DEVICE"
+          xcrun simctl bootstatus "$DEVICE" -b
       - name: Test
         run: |
           FILTER=()
           if [[ "${{ inputs.suite }}" == Share ]]; then
             FILTER=(-only-testing:NoProcrastinateUITests/StudyShareUITests)
+          elif [[ "${{ inputs.suite }}" == Widget ]]; then
+            FILTER=(-only-testing:NoProcrastinateUITests/StudyWidgetUITests)
           fi
-          xcodebuild test -project NoProcrastinate.xcodeproj -scheme NoProcrastinate -destination "platform=iOS Simulator,id=$DEVICE" -parallel-testing-enabled NO CODE_SIGN_STYLE=Manual CODE_SIGNING_ALLOWED=YES CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=- -resultBundlePath Results.xcresult "${FILTER[@]}"
+          xcodebuild test-without-building -project NoProcrastinate.xcodeproj -scheme NoProcrastinate -derivedDataPath Build -destination "platform=iOS Simulator,id=$DEVICE" -parallel-testing-enabled NO CODE_SIGN_STYLE=Manual CODE_SIGNING_ALLOWED=YES CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=- -resultBundlePath Results.xcresult "${FILTER[@]}"
       - name: Device build
         run: xcodebuild build -project NoProcrastinate.xcodeproj -scheme NoProcrastinate -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO
       - name: Screenshots
