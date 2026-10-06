@@ -46,16 +46,17 @@ final class StudySupervisionUITests: XCTestCase {
         app.tabBars.buttons["Supervision"].tap()
         let toggle = app.switches["EnableReminders"]
         XCTAssertTrue(toggle.waitForExistence(timeout: 5))
-        toggle.tap()
+        toggle.coordinate(withNormalizedOffset: CGVector(dx: 0.92, dy: 0.5)).tap()
         let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
         let allow = springboard.alerts.buttons["Allow"]
         if allow.waitForExistence(timeout: 3) { allow.tap() }
         else if app.alerts.buttons["Allow"].exists { app.alerts.buttons["Allow"].tap() }
         let scheduled = app.descendants(matching: .any)["ScheduledReminders"]
+        capture("Reminder access", app)
         expectation(for: NSPredicate(format: "value == %@", "2"), evaluatedWith: scheduled)
         waitForExpectations(timeout: 10)
         capture("Supervision", app)
-        toggle.tap()
+        toggle.coordinate(withNormalizedOffset: CGVector(dx: 0.92, dy: 0.5)).tap()
         expectation(for: NSPredicate(format: "value == %@", "0"), evaluatedWith: scheduled)
         waitForExpectations(timeout: 10)
     }
