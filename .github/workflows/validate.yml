@@ -43,7 +43,10 @@ jobs:
           app = 'Build/Build/Products/Debug-iphonesimulator/NoProcrastinate.app'
           framework = app + '/Frameworks/NoProcrastinateCore.framework/NoProcrastinateCore'
           expected = '@rpath/NoProcrastinateCore.framework/NoProcrastinateCore'
-          assert expected in subprocess.check_output(['otool', '-L', app + '/NoProcrastinate'], text=True)
+          binary = app + '/NoProcrastinate.debug.dylib'
+          if not os.path.exists(binary):
+              binary = app + '/NoProcrastinate'
+          assert expected in subprocess.check_output(['otool', '-L', binary], text=True)
           assert expected in subprocess.check_output(['otool', '-D', framework], text=True)
           device = os.environ['DEVICE']
           bundle = 'com.drivenligret.NoProcrastinate'
