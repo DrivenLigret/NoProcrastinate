@@ -85,6 +85,8 @@ final class StudyShareUITests: XCTestCase {
         if !target.exists {
             let share = safari.buttons["Share"].firstMatch
             if !share.waitForExistence(timeout: 3) || !share.isHittable {
+                let tipClose = safari.buttons["xmark.circle.fill"].firstMatch
+                if tipClose.waitForExistence(timeout: 3) { tipClose.tap() }
                 let menu = safari.buttons["MoreMenuButton"].firstMatch
                 XCTAssertTrue(menu.waitForExistence(timeout: 10))
                 let menuReady = XCTNSPredicateExpectation(predicate: NSPredicate(format: "enabled == true AND hittable == true"), object: menu)
