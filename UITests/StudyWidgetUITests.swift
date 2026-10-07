@@ -43,7 +43,7 @@ final class StudyWidgetUITests: XCTestCase {
         let addWidget = home.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Add Widget")).firstMatch
         XCTAssertTrue(addWidget.waitForExistence(timeout: 10))
         capture("Small widget", home)
-        let pager = home.pageIndicators.allElementsBoundByIndex.first { $0.frame.minY > home.frame.height * 0.86 && $0.frame.maxY < home.frame.height }
+        let pager = home.pageIndicators.allElementsBoundByIndex.first { $0.isHittable }
         XCTAssertNotNil(pager)
         pager?.coordinate(withNormalizedOffset: CGVector(dx: 0.75, dy: 0.5)).tap()
         let medium = home.buttons.matching(NSPredicate(format: "value CONTAINS %@", "Widget, Medium")).firstMatch
@@ -57,6 +57,7 @@ final class StudyWidgetUITests: XCTestCase {
         attachment.name = "Home widget"
         attachment.lifetime = .keepAlways
         add(attachment)
+        app.terminate()
         task.tap()
         XCTAssertTrue(app.staticTexts["TaskDetailTitle"].waitForExistence(timeout: 10))
         XCTAssertEqual(app.staticTexts["TaskDetailTitle"].label, "Review chapter 5")
@@ -67,6 +68,7 @@ final class StudyWidgetUITests: XCTestCase {
         XCTAssertTrue(home.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@", "Plan a task")).firstMatch.exists)
         capture("Updated medium widget", home)
         let progress = home.descendants(matching: .any).matching(NSPredicate(format: "label == %@", "Progress")).firstMatch
+        app.terminate()
         progress.tap()
         XCTAssertTrue(app.navigationBars["Progress"].waitForExistence(timeout: 10))
     }

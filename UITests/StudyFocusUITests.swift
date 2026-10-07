@@ -31,8 +31,10 @@ final class StudyFocusUITests: XCTestCase {
         XCTAssertLessThan(seconds(timer.label), before)
         XCTAssertTrue(app.staticTexts["Draft essay"].exists)
         app.buttons["StopFocus"].tap()
-        XCTAssertTrue(app.buttons["ConfirmStopFocus"].waitForExistence(timeout: 5))
-        app.buttons["ConfirmStopFocus"].tap()
+        let confirmStop = app.sheets.buttons["Stop"].firstMatch
+        XCTAssertTrue(confirmStop.waitForExistence(timeout: 5))
+        capture("Stop focus confirmation", app)
+        confirmStop.tap()
         XCTAssertTrue(app.staticTexts["Focus stopped"].waitForExistence(timeout: 5))
         app.tabBars.buttons["Plan"].tap()
         app.buttons["StudyTaskRow"].firstMatch.tap()

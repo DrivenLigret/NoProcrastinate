@@ -13,7 +13,11 @@ permissions:
   contents: read
 jobs:
   test:
-    runs-on: macos-15
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-15, macos-26]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - name: Simulator
@@ -30,6 +34,28 @@ jobs:
           xcrun simctl shutdown "$DEVICE"
           xcrun simctl boot "$DEVICE"
           xcrun simctl bootstatus "$DEVICE" -b
+      - name: Independent startup
+        run: |
+          python3 - <<'PY'
+          import os
+          import subprocess
+          import time
+          app = 'Build/Build/Products/Debug-iphonesimulator/NoProcrastinate.app'
+          framework = app + '/Frameworks/NoProcrastinateCore.framework/NoProcrastinateCore'
+          expected = '@rpath/NoProcrastinateCore.framework/NoProcrastinateCore'
+          assert expected in subprocess.check_output(['otool', '-L', app + '/NoProcrastinate'], text=True)
+          assert expected in subprocess.check_output(['otool', '-D', framework], text=True)
+          device = os.environ['DEVICE']
+          bundle = 'com.drivenligret.NoProcrastinate'
+          for attempt in range(2):
+              launched = subprocess.check_output(['xcrun', 'simctl', 'launch', device, bundle], text=True)
+              pid = launched.strip().split(':')[-1].strip()
+              for check in range(5):
+                  time.sleep(2)
+                  processes = subprocess.check_output(['xcrun', 'simctl', 'spawn', device, 'launchctl', 'list'], text=True)
+                  assert any(line.split()[0] == pid and bundle in line for line in processes.splitlines() if line.split())
+              subprocess.run(['xcrun', 'simctl', 'terminate', device, bundle], check=True)
+          PY
       - name: Test
         run: |
           FILTER=()
@@ -42,7 +68,9 @@ jobs:
           fi
           xcodebuild test-without-building -project NoProcrastinate.xcodeproj -scheme NoProcrastinate -derivedDataPath Build -destination "platform=iOS Simulator,id=$DEVICE" -parallel-testing-enabled NO CODE_SIGN_STYLE=Manual CODE_SIGNING_ALLOWED=YES CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=- -resultBundlePath Results.xcresult "${FILTER[@]}"
       - name: Device build
-        run: xcodebuild build -project NoProcrastinate.xcodeproj -scheme NoProcrastinate -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO
+        run: |
+          xcodebuild build -project NoProcrastinate.xcodeproj -scheme NoProcrastinate -configuration Release -derivedDataPath DeviceBuild -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO
+          otool -L DeviceBuild/Build/Products/Release-iphoneos/NoProcrastinate.app/NoProcrastinate | grep -F '@rpath/NoProcrastinateCore.framework/NoProcrastinateCore'
       - name: Screenshots
         if: always() && hashFiles('Results.xcresult/Info.plist') != ''
         continue-on-error: true
@@ -66,7 +94,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: Results
+          name: Results-${{ matrix.os }}
           path: |
             Results.xcresult
             Screenshots

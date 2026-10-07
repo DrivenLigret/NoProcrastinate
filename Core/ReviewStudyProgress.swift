@@ -19,21 +19,29 @@ public struct ReviewStudyProgress {
     public func execute(from start: Date, until end: Date) throws -> StudyProgress {
         guard end > start else { throw Failure.invalidStudyPeriod }
         let tasks = try repository.tasks()
-        let sessions = try repository.sessions().filter { $0.endedAt != nil }
-        let completedTasks = tasks.filter {
-            guard let completed = $0.completedAt else { return false }
-            return completed >= start && completed < end
-        }.count
-        let focusSeconds = sessions.reduce(0) { total, session in
-            guard let ended = session.endedAt else { return total }
+        let sessions = try repository.sessions()
+        var completedTasks = 0
+        var focusSeconds = 0
+        var completedSessions = 0
+        var interruptedSessions = 0
+        for task in tasks {
+            if let completed = task.completedAt, completed >= start && completed < end {
+                completedTasks += 1
+            }
+        }
+        for session in sessions {
+            guard let ended = session.endedAt else { continue }
             let lower = max(start, session.startedAt)
             let upper = min(end, min(ended, session.expectedEnd))
-            return total + max(0, Int(upper.timeIntervalSince(lower)))
+            focusSeconds += max(0, Int(upper.timeIntervalSince(lower)))
+            if ended >= start && ended < end {
+                if session.interrupted {
+                    interruptedSessions += 1
+                } else {
+                    completedSessions += 1
+                }
+            }
         }
-        let attempts = sessions.filter {
-            guard let ended = $0.endedAt else { return false }
-            return ended >= start && ended < end
-        }
-        return StudyProgress(completedTasks: completedTasks, focusSeconds: focusSeconds, completedSessions: attempts.filter { !$0.interrupted }.count, interruptedSessions: attempts.filter(\.interrupted).count)
+        return StudyProgress(completedTasks: completedTasks, focusSeconds: focusSeconds, completedSessions: completedSessions, interruptedSessions: interruptedSessions)
     }
 }

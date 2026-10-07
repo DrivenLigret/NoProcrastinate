@@ -32,9 +32,9 @@ final class StudyShareUITests: XCTestCase {
         XCTAssertFalse(resourceTitle?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true)
         capture("Share", safari)
         safari.buttons["SaveResource"].tap()
-        XCTAssertTrue(safari.buttons["Share"].waitForExistence(timeout: 10))
-        let ready = XCTNSPredicateExpectation(predicate: NSPredicate(format: "enabled == true"), object: safari.buttons["Share"])
-        XCTAssertEqual(XCTWaiter.wait(for: [ready], timeout: 30), .completed)
+        let dismissed = XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == false"), object: safari.buttons["SaveResource"])
+        XCTAssertEqual(XCTWaiter.wait(for: [dismissed], timeout: 30), .completed)
+        XCTAssertTrue(address.waitForExistence(timeout: 10))
         app.activate()
         let pending = app.buttons["InboxResource"].firstMatch
         XCTAssertTrue(pending.waitForExistence(timeout: 10))
@@ -83,10 +83,16 @@ final class StudyShareUITests: XCTestCase {
     private func openShare(_ safari: XCUIApplication) {
         let target = safari.descendants(matching: .any).matching(NSPredicate(format: "label == %@", "NoProcrastinate")).firstMatch
         if !target.exists {
-            XCTAssertTrue(safari.buttons["Share"].waitForExistence(timeout: 10))
-            let ready = XCTNSPredicateExpectation(predicate: NSPredicate(format: "enabled == true AND hittable == true"), object: safari.buttons["Share"])
+            let share = safari.buttons["Share"].firstMatch
+            if !share.waitForExistence(timeout: 3) || !share.isHittable {
+                let menu = safari.buttons["More"].firstMatch
+                XCTAssertTrue(menu.waitForExistence(timeout: 10))
+                menu.tap()
+            }
+            XCTAssertTrue(share.waitForExistence(timeout: 10))
+            let ready = XCTNSPredicateExpectation(predicate: NSPredicate(format: "enabled == true AND hittable == true"), object: share)
             XCTAssertEqual(XCTWaiter.wait(for: [ready], timeout: 30), .completed)
-            safari.buttons["Share"].tap()
+            share.tap()
             if !target.waitForExistence(timeout: 3) {
                 let more = safari.buttons["More"].firstMatch
                 if more.exists { more.tap() }
