@@ -85,9 +85,11 @@ final class StudyShareUITests: XCTestCase {
         if !target.exists {
             let share = safari.buttons["Share"].firstMatch
             if !share.waitForExistence(timeout: 3) || !share.isHittable {
-                let menu = safari.buttons["More"].firstMatch
+                let menu = safari.buttons["MoreMenuButton"].firstMatch
                 XCTAssertTrue(menu.waitForExistence(timeout: 10))
-                menu.tap()
+                let menuReady = XCTNSPredicateExpectation(predicate: NSPredicate(format: "enabled == true AND hittable == true"), object: menu)
+                XCTAssertEqual(XCTWaiter.wait(for: [menuReady], timeout: 30), .completed)
+                menu.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
             }
             XCTAssertTrue(share.waitForExistence(timeout: 10))
             let ready = XCTNSPredicateExpectation(predicate: NSPredicate(format: "enabled == true AND hittable == true"), object: share)
