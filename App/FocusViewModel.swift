@@ -27,7 +27,10 @@ final class FocusViewModel: ObservableObject {
             let restored = try RestoreFocusSession(repository: repository, restrictions: supervision.restrictions).execute(at: Date())
             let previous = try repository.sessions().last(where: { $0.endedAt != nil })
             let displayed = restored ?? previous
-            let title = try displayed.flatMap { try repository.task(id: $0.taskID)?.title } ?? ""
+            var title = ""
+            if let displayed {
+                title = try repository.task(id: displayed.taskID)?.title ?? ""
+            }
             active = restored
             lastSession = previous
             taskTitle = title

@@ -5,9 +5,14 @@ final class StudyWidgetUITests: XCTestCase {
 
     func testHomeScreenWidgetReadsThePlannedTaskAndOpensItsDetails() {
         let app = XCUIApplication()
-        app.launchArguments = ["-ui-testing", "-reset-study-records"]
+        app.launchArguments = []
         app.launch()
         XCTAssertTrue(app.buttons["NewTask"].waitForExistence(timeout: 10))
+        app.tabBars.buttons["Progress"].tap()
+        let today = app.descendants(matching: .any)["TodayCompletedTasks"]
+        XCTAssertTrue(today.waitForExistence(timeout: 5))
+        let completedBefore = Int(today.value as? String ?? "0") ?? 0
+        app.tabBars.buttons["Plan"].tap()
         app.buttons["NewTask"].tap()
         let title = app.textFields["TaskTitle"]
         XCTAssertTrue(title.waitForExistence(timeout: 5))
@@ -63,7 +68,7 @@ final class StudyWidgetUITests: XCTestCase {
         XCTAssertEqual(app.staticTexts["TaskDetailTitle"].label, "Review chapter 5")
         app.buttons["CompleteTask"].tap()
         XCUIDevice.shared.press(.home)
-        let completed = home.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@", "1 done")).firstMatch
+        let completed = home.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@", "\(completedBefore + 1) done")).firstMatch
         XCTAssertTrue(completed.waitForExistence(timeout: 60))
         XCTAssertTrue(home.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@", "Plan a task")).firstMatch.exists)
         capture("Updated medium widget", home)

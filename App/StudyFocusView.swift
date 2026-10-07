@@ -11,7 +11,9 @@ struct StudyFocusView: View {
             Group {
                 if let session = focus.active {
                     TimelineView(.periodic(from: .now, by: 1)) { timeline in
-                        let remaining = max(0, min(session.plannedMinutes * 60, Int(ceil(session.expectedEnd.timeIntervalSince(timeline.date)))))
+                        let totalSeconds = session.plannedMinutes * 60
+                        let secondsUntilEnd = Int(ceil(session.expectedEnd.timeIntervalSince(timeline.date)))
+                        let remaining = max(0, min(totalSeconds, secondsUntilEnd))
                         VStack(spacing: 28) {
                             Text(focus.taskTitle).font(.title2.bold()).multilineTextAlignment(.center)
                             ZStack {
